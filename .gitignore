@@ -8,8 +8,7 @@ site-images/video/brand-overview.mp4
 site-images/grace/source/grace_4k_uprez.png
 site-images/grace/source/grace_blue_bg.png
 
-# Active videos (too large for GitHub — deploy separately)
-site-images/grace/video/GRACE_ap.mp4
+# Active video — too large for GitHub, deploy separately
 site-images/video/HOWTOVIDEOF.mp4
 
 # OS files
