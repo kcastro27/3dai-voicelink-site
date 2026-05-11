@@ -2654,6 +2654,22 @@
   (function(){
     // Load agents dynamically from Retell
     const agentSelect = document.getElementById('demo-agent');
+    window._demoAgentsLoaded = false;
+    window._pendingDemoAgent = null;
+
+    function normalize(str) {
+      return str.toLowerCase().replace(/[-_\s]/g, '');
+    }
+
+    function applyPendingAgent() {
+      if (!window._pendingDemoAgent) return;
+      const target = normalize(window._pendingDemoAgent);
+      Array.from(agentSelect.options).forEach(opt => {
+        if (normalize(opt.textContent) === target) opt.selected = true;
+      });
+      window._pendingDemoAgent = null;
+    }
+
     fetch('/api/retell/agents')
       .then(r => r.json())
       .then(data => {
@@ -2665,6 +2681,8 @@
           opt.textContent = agent.agent_name.replace(/^DEMO-/i, '').replace(/[-_]/g, ' ');
           agentSelect.appendChild(opt);
         });
+        window._demoAgentsLoaded = true;
+        applyPendingAgent();
       })
       .catch(() => {
         agentSelect.innerHTML = '<option value="" disabled selected>Select an Agent...</option>';
@@ -3416,14 +3434,8 @@ if (demoSelect) {
 document.querySelectorAll('.industry-card[data-agent]').forEach(card => {
   card.addEventListener('click', () => {
     const agent = card.dataset.agent;
-    const select = document.querySelector('.demo-select');
-    if (select) {
-      Array.from(select.options).forEach(opt => {
-        if (opt.text === agent) opt.selected = true;
-      });
-      select.classList.add('agent-selected');
-      select.dispatchEvent(new Event('change'));
-    }
+    window._pendingDemoAgent = agent;
+    if (window._demoAgentsLoaded) applyPendingAgent();
     document.querySelector('#live-demo').scrollIntoView({ behavior: 'smooth' });
     setTimeout(() => {
       const phoneInput = document.querySelector('.demo-phone');
